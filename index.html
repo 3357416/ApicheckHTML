@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="sp">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+    <title>API Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .header {
+            text-align: center;
+			margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .header h2 {
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+		
+		#process {
+			width: 25%;
+		}
+
+
+        label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        select, input {
+            width: 80%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Define new CSS classes for result cues */
+        .result-pass {
+            color: #4CAF50; /* Green */
+        }
+
+        .result-fail {
+            color: #FF5733; /* Red */
+        }
+
+        .result-error {
+            color: #FF5733; /* Red */
+        }
+
+        /* Define new CSS class for result text */
+        .result-text {
+            font-size: 2em;
+            text-align: center;
+            margin-top: 20px;
+            /* Center the text horizontally and vertically */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Make "PASS," "FAIL," and "ERROR" messages bigger and centered */
+        .result-text-pass {
+            font-size: 100px;
+            color: #4CAF50; /* Green */
+        }
+
+        .result-text-fail {
+            font-size: 100px;
+            color: #FF5733; /* Red */
+        }
+
+        .result-text-error {
+            font-size: 100px;
+            color: #FF5733; /* Red */
+        }
+
+        /* Footer styles */
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+		<img src="https://jabil.okta.com/fs/bco/1/fs05cu0mejtyuWuyn0x7">
+        <h2>API Checker</h2>
+        
+    </div>
+
+    <div class="container">
+        <p>Seleccione la estacion:</p>
+        <label for="process">Estacion:</label>
+        <select id="process">
+            <option value="WBST">WBST</option>
+            <option value="WETT">WETT</option>
+            <option value="WFMT">WFMT</option>
+            <option value="WITT">WITT</option>
+            <option value="WSBT">WSBT</option>
+            <option value="WSDT">WSDT</option>
+            <option value="WSMT">WSMT</option>
+            <option value="WVBT">WVBT</option>
+            <option value="WAAT">WAAT</option>
+            <option value="WAVT">WAVT</option>
+            <option value="WETA">WETA</option>
+            <option value="WETI">WETI</option>
+            <option value="WETP">WETP</option>
+            <option value="WPAT">WPAT</option>
+            <option value="OBAT">OBAT</option>
+            <option value="WCSF">WCSF</option>
+            <option value="WUSF">WUSF</option>
+        </select>
+
+		<br>
+
+        <label for="serial">Numero de serie:</label>
+        <input type="text" id="serial" placeholder="Escanee el Numero de Serie">
+
+        <button onclick="checkAPI()">Buscar</button>
+
+        <!-- Result text div -->
+        <div class="result-text" id="resultText"></div>
+        <div id="result"></div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        by Luis Hernandez<br>
+        luis_hernandez3357416@jabil.com
+    </div>
+
+    <script>
+        function checkAPI() {
+            const process = document.getElementById("process").value;
+            const serial = document.getElementById("serial").value;
+
+            // Check if the serial number has exactly 12 characters
+            if (serial.length !== 12) {
+                document.getElementById("result").innerHTML = `
+                    <h3>Error:</h3>
+                    <p>El nmero de serie debe tener exactamente 12 caracteres.</p>
+                `;
+                document.getElementById("result").className = "result-fail"; // Apply red cue for errors
+                document.getElementById("resultText").innerHTML = "ERROR";
+                document.getElementById("resultText").className = "result-text-error"; // Apply red text color
+                return; // Exit the function
+            }
+
+            const equipmentDict = {
+                "WBST": "GDLDWWBST201",
+                "WETT": "GDLNWWETT201",
+                "WFMT": "GDLDWWFMT201",
+                "WITT": "GDLDWWITT201",
+                "WSBT": "GDLDWWSBT201",
+                "WSDT": "GDLDWWSDT201",
+                "WSMT": "GDLDWWSMT201",
+                "WVBT": "GDLDWWVBT201",
+                "WAAT": "GDLDWWAAT201",
+                "WAVT": "GDLNWWAVT201",
+                "WETA": "GDLNWWETA201",
+                "WETI": "GDLNWWETI201",
+                "WETP": "GDLNWWETP201",
+                "WPAT": "GDLDWWPAT201",
+                "OBAT": "GDLDWOBAS201",
+                "WCSF": "GDLDWWCSF201",
+                "WUSF": "GDLDWWUSF201"
+            };
+
+            const equipment = equipmentDict[process];
+            const resultDiv = document.getElementById("result");
+            const resultTextDiv = document.getElementById("resultText");
+
+            const url = `http://mxgdlm7tis03/GE/v1/api/routing/routecheck?process=${process}&equipmentName=${equipment}&serialNumber=${serial}`;
+
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    const statusIndex = data.indexOf('PASS');
+
+                    if (statusIndex !== -1) {
+                        resultDiv.innerHTML = `
+                            <h3>Serial Escaneado: ${serial}</h3>
+                            <p>Esta unidad SI se puede probar</p>
+                        `;
+                        resultDiv.className = "result-pass"; // Apply green cue
+                        resultTextDiv.innerHTML = "PASS";
+                        resultTextDiv.className = "result-text-pass"; // Apply green text color
+                    } else {
+                        resultDiv.innerHTML = `
+                            <h3>Serial Escaneado: ${serial}</h3>
+                            <p>Esta unidad NO se puede probar</p>
+                        `;
+                        resultDiv.className = "result-fail"; // Apply red cue
+                        resultTextDiv.innerHTML = "FAIL";
+                        resultTextDiv.className = "result-text-fail"; // Apply red text color
+                    }
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = `
+                        <h3>Error:</h3>
+                        <p>${error.message}</p>
+                    `;
+                    resultDiv.className = "result-fail"; // Apply red cue for errors
+                    resultTextDiv.innerHTML = "ERROR";
+                    resultTextDiv.className = "result-text-error"; // Apply red text color
+                });
+        }
+    </script>
+</body>
+</html>
